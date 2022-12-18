@@ -1,6 +1,7 @@
 package com.wso2.custom.risk.auth.function.internal;
 
 import com.wso2.custom.risk.auth.function.GetRiskScoreImpl;
+import com.wso2.custom.risk.auth.function.util.ConfigReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +29,7 @@ public class CustomAuthFunctionComponent {
 
         GetRiskScoreImpl getRiskScore = new GetRiskScoreImpl();
         jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "getRiskScoreFromContext", getRiskScore);
+        ConfigReader.readProperties();
     }
 
     @Deactivate
