@@ -4,10 +4,11 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.wso2.custom.risk.auth.function.dao.UserProfileDaoImp;
 
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
 import org.bson.Document;
 import org.joda.time.DateTime;
@@ -29,14 +30,6 @@ public class GetRiskScoreImpl implements GetRiskScore {
 
     private static final Log log = LogFactory.getLog(SessionDataStore.class);
     private final static String USER_AGENT_HEADER_NAME = "user-agent";
-
-
-    private final static String MONGO_DB_URI = "mongodb://localhost:27017";
-    private final static String DATABASE_NAME = "WSO2_IS_RISK_AUTH";
-    private final static String COLLECTION_NAME = "USER_ATTR";
-
-    private MongoCollection<Document> userAttributeCollection;
-
     private UserProfile userProfile;
 
     @Override
@@ -51,14 +44,9 @@ public class GetRiskScoreImpl implements GetRiskScore {
         }
 
         initUserAttributes(userId, request.getWrapped().getWrapped());
-
-        MongoClient mongoClient = createMongoClient();
-        MongoDatabase riskAuthDatabase = mongoClient.getDatabase(DATABASE_NAME);
-        this.userAttributeCollection = riskAuthDatabase.getCollection(COLLECTION_NAME);
-
-        Optional<Document> userDocument = getUserDocument(userId);
-        if (userDocument.isEmpty()) {
-            userAttributeCollection.insertOne(userProfile.getDocumentFromObject());
+        Optional<Document> previousUserLoginData = UserProfileDaoImp.getInstance().getPreviousUserLoginDataByUserId(userId);
+        if (previousUserLoginData.isEmpty()) {
+            UserProfileDaoImp.getInstance().createUserDocument(userProfile.getDocumentFromObject());
             return 1;
         }
 
@@ -68,8 +56,6 @@ public class GetRiskScoreImpl implements GetRiskScore {
         * 3. Return Risk Score.
         * */
 
-
-        mongoClient.close();
         return 0;
     }
 
@@ -86,44 +72,12 @@ public class GetRiskScoreImpl implements GetRiskScore {
                 .build();
     }
 
-
-
-    private MongoClient createMongoClient() {
-
-        return MongoClients.create(MONGO_DB_URI);
-    }
-
-    private Optional<Document> getUserDocument(String userId) {
-
-        Document userDocument = userAttributeCollection.find(new Document("user_id", userId)).first();
-        if (userDocument != null) {
-            return Optional.of(userDocument);
-        }
-        return Optional.empty();
-    }
-
     // TODO: Need to introduce another function to update the user Attributes after successful login.
 
-    private int getHourOfDay() {
 
-        DateTime dt = new DateTime();
-        return dt.getHourOfDay();
-    }
+    private HttpPost sendHttpPostRequest(Document previousLoginData) {
 
-
-    private HttpPost sendHttpPostRequest(HttpServletRequest httpServletRequest) {
-
-        String userAgentHeader = httpServletRequest.getHeader(USER_AGENT_HEADER_NAME);
-        Locale locale = httpServletRequest.getLocale();
-        UserAgent userAgent = new UserAgent(userAgentHeader);
-        String userDevice = userAgent.getDevice();
-        String userBrowser = userAgent.getBrowser();
-        String userPlatform = userAgent.getPlatform();
-        String clientIpAddress = IdentityUtil.getClientIpAddress(httpServletRequest);
-        int hourOfTheDay = getHourOfDay();
-
-        HttpPost post = new HttpPost("http://jakarata.apache.org/");
-        return post;
+        return null;
     }
 
 

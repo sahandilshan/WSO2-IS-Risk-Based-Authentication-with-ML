@@ -13,7 +13,6 @@ public class UserProfile {
     private final static  String BROWSER = "browser";
     private final static  String PLATFORM = "platform";
     private final static  String IP_ADDRESS = "ip";
-
     private final static String LANGUAGE = "lang";
 
     private final String userId;
@@ -68,12 +67,6 @@ public class UserProfile {
 
     public List<NameValuePair> compareWithPreviousLoginData(Document previousLoginData) {
 
-        /*
-        * If ip saved enbled?
-        *   Get IP details
-        *   Compare it with current
-        * Get
-        * */
         List<NameValuePair> payload = new ArrayList<>();
         String previousDevice = previousLoginData.getString(DEVICE);
         payload.add(new NameValuePair(DEVICE, compareAttributes(this.device, previousDevice)));
@@ -87,12 +80,18 @@ public class UserProfile {
         String previousLanguage = previousLoginData.getString(LANGUAGE);
         payload.add(new NameValuePair(LANGUAGE, compareAttributes(this.language, previousLanguage)));
 
+        /*
+         * If ip saved enabled?
+         *   Get IP details
+         *   Compare it with current
+         * Get
+         * */
         if (SAVE_IP_ADDRESS) {
             String previousIp = previousLoginData.getString(IP_ADDRESS);
             payload.add(new NameValuePair(IP_ADDRESS, compareAttributes(this.ipAddress, previousIp)));
             return payload;
         }
-        payload.add(new NameValuePair(IP_ADDRESS, "0")); // To ignore the IP attribute
+        payload.add(new NameValuePair(IP_ADDRESS, "0")); // To ignore the IP attribute.
         return payload;
     }
 
