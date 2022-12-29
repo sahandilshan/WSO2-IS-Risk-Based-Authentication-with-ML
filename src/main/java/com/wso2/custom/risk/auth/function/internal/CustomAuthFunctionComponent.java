@@ -1,6 +1,7 @@
 package com.wso2.custom.risk.auth.function.internal;
 
 import com.wso2.custom.risk.auth.function.GetRiskScoreImpl;
+import com.wso2.custom.risk.auth.function.UpdateUserProfileImpl;
 import com.wso2.custom.risk.auth.function.util.ConfigReader;
 
 import org.apache.commons.logging.Log;
@@ -27,8 +28,8 @@ public class CustomAuthFunctionComponent {
     @Activate
     protected void activate(ComponentContext ctxt) {
 
-        GetRiskScoreImpl getRiskScore = new GetRiskScoreImpl();
-        jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "getRiskScoreFromContext", getRiskScore);
+        jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "getRiskScoreFromContext", new GetRiskScoreImpl());
+        jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "updateUserRiskProfile", new UpdateUserProfileImpl());
         ConfigReader.readProperties();
     }
 
@@ -36,9 +37,8 @@ public class CustomAuthFunctionComponent {
     protected void deactivate(ComponentContext ctxt) {
 
         if (jsFunctionRegistry != null) {
-//            jsFunctionRegistry.deRegister(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "setForceAuth");
             jsFunctionRegistry.deRegister(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "getRiskScoreFromContext");
-//            jsFunctionRegistry.deRegister(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "getClaimsForUsername");
+            jsFunctionRegistry.deRegister(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "updateUserRiskProfile");
         }
     }
 
