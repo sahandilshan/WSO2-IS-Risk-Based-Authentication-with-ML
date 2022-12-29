@@ -5,9 +5,11 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import com.wso2.custom.risk.auth.function.util.ConfigReader;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.wso2.carbon.identity.core.persistence.JDBCPersistenceManager;
 
 import java.util.Optional;
@@ -59,8 +61,15 @@ public class UserProfileDaoImp implements UserProfileDao {
     }
 
     @Override
-    public void UpdateUserLoginData(Document userProfile) {
+    public void updateUserLoginData(String userId, Document userProfile) {
 
+        try {
+            createConnection();
+            Bson filter = Filters.eq("userId", userId);
+            userAttributeCollection.replaceOne(filter, userProfile);
+        } finally {
+            mongoClient.close();
+        }
     }
 
     @Override

@@ -8,7 +8,7 @@ public interface UserProfileDao {
 
     Optional<Document> getPreviousUserLoginDataByUserId(String userId);
 
-    void UpdateUserLoginData(Document userProfile);
+    void updateUserLoginData(String userId, Document userProfile);
 
     void createUserDocument(Document userProfile);
 
