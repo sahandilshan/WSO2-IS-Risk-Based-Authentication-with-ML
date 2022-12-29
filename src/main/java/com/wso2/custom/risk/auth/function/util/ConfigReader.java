@@ -75,4 +75,14 @@ public class ConfigReader {
         String property = properties.getProperty("user.save_ip_address", "false");
         return Boolean.parseBoolean(property);
     }
+
+    public static String getServerHostName() {
+
+        return properties.getProperty("server.host.name", "localhost");
+    }
+
+    public static String getServerPort() {
+
+        return properties.getProperty("server.port", "5000");
+    }
 }
