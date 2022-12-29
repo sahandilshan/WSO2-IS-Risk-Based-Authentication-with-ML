@@ -1,7 +1,10 @@
 package com.wso2.custom.risk.auth.function;
 
-import org.apache.commons.httpclient.NameValuePair;
+import com.wso2.custom.risk.auth.function.util.ConfigReader;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -22,35 +25,9 @@ public class UserProfile {
     private String browser;
     private String language;
 
-    public static final boolean SAVE_IP_ADDRESS = true;
-
     private UserProfile(String userId) {
 
         this.userId = userId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public String getDevice() {
-        return device;
-    }
-
-    public String getPlatform() {
-        return platform;
-    }
-
-    public String getBrowser() {
-        return browser;
-    }
-
-    public String getLanguage() {
-        return language;
     }
 
     public Document getDocumentFromObject() {
@@ -69,16 +46,16 @@ public class UserProfile {
 
         List<NameValuePair> payload = new ArrayList<>();
         String previousDevice = previousLoginData.getString(DEVICE);
-        payload.add(new NameValuePair(DEVICE, compareAttributes(this.device, previousDevice)));
+        payload.add(new BasicNameValuePair(DEVICE, compareAttributes(this.device, previousDevice)));
 
         String previousPlatform = previousLoginData.getString(PLATFORM);
-        payload.add(new NameValuePair(PLATFORM, compareAttributes(this.platform, previousPlatform)));
+        payload.add(new BasicNameValuePair(PLATFORM, compareAttributes(this.platform, previousPlatform)));
 
         String previousBrowser = previousLoginData.getString(BROWSER);
-        payload.add(new NameValuePair(BROWSER, compareAttributes(this.browser, previousBrowser)));
+        payload.add(new BasicNameValuePair(BROWSER, compareAttributes(this.browser, previousBrowser)));
 
         String previousLanguage = previousLoginData.getString(LANGUAGE);
-        payload.add(new NameValuePair(LANGUAGE, compareAttributes(this.language, previousLanguage)));
+        payload.add(new BasicNameValuePair(LANGUAGE, compareAttributes(this.language, previousLanguage)));
 
         /*
          * If ip saved enabled?
@@ -86,12 +63,12 @@ public class UserProfile {
          *   Compare it with current
          * Get
          * */
-        if (SAVE_IP_ADDRESS) {
+        if (ConfigReader.canSaveIpAddress()) {
             String previousIp = previousLoginData.getString(IP_ADDRESS);
-            payload.add(new NameValuePair(IP_ADDRESS, compareAttributes(this.ipAddress, previousIp)));
+            payload.add(new BasicNameValuePair(IP_ADDRESS, compareAttributes(this.ipAddress, previousIp)));
             return payload;
         }
-        payload.add(new NameValuePair(IP_ADDRESS, "0")); // To ignore the IP attribute.
+        payload.add(new BasicNameValuePair(IP_ADDRESS, "0")); // To ignore the IP attribute.
         return payload;
     }
 
