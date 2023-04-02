@@ -63,7 +63,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
-                <version>1.24.0</version>
+                <version>1.26.2</version>
                 <executions>
                     <execution>
                         <id>generate-scr-scrdescriptor</id>
@@ -89,7 +89,7 @@
                         </Private-Package>
                         <Export-Package>
                             !com.wso2.custom.risk.auth.function.internal,
-                            com.wso2.custom.risk.auth.function
+                            com.wso2.custom.risk.auth.function.*;
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.identity.application.common.*,
@@ -114,7 +114,8 @@
                             org.wso2.carbon.registry.core.service,
                             org.wso2.carbon.user.core,
                             org.wso2.carbon.user.core.claim,
-                            org.wso2.carbon.user.core.service
+                            org.wso2.carbon.user.core.service,
+                            *;resolution:=optional,
                         </Import-Package>
                     </instructions>
                 </configuration>
