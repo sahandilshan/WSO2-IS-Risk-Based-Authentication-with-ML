@@ -11,11 +11,11 @@ app = Flask(__name__)
 def calculate_risk_score():
 
     data = {
-        "ip": 0 if request.form.get('ip') is None else request.form.get('ip'),
-        "device": 0 if request.form.get('device') is None else request.form.get('device'),
-        "platform": 0 if request.form.get('platform') is None else request.form.get('platform'),
-        "browser": 0 if request.form.get('browser') is None else request.form.get('browser'),
-        "language": 0 if request.form.get('lang') is None else request.form.get('lang')
+        "ip": 0 if request.form.get('ip') is None else int(request.form.get('ip')),
+        "device": 0 if request.form.get('device') is None else int(request.form.get('device')),
+        "platform": 0 if request.form.get('platform') is None else int(request.form.get('platform')),
+        "browser": 0 if request.form.get('browser') is None else int(request.form.get('browser')),
+        "language": 0 if request.form.get('lang') is None else int(request.form.get('lang'))
     }
     score = predict(data)
     return {
@@ -27,4 +27,3 @@ def predict(data):
 
     x_data = np.array([[data["ip"], data["device"], data['platform'], data['browser'], data['language']]])
     return model.predict(x_data)[0]
-
