@@ -31,7 +31,6 @@ import java.util.Optional;
 public class GetRiskScoreImpl implements GetRiskScore {
 
     private static final Log log = LogFactory.getLog(GetRiskScoreImpl.class);
-    private UserProfile userProfile;
 
     @Override
     public int getRiskScoreFromContext(JsAuthenticationContext context, JsServletRequest request) throws ServerException {
@@ -44,30 +43,29 @@ public class GetRiskScoreImpl implements GetRiskScore {
             return 1;
         }
 
-        userProfile = RiskScoreUtil.getUserProfileFromHttpRequest(userId, request.getWrapped().getWrapped());
+        UserProfile userProfile = RiskScoreUtil.getUserProfileFromHttpRequest(userId, request.getWrapped().getWrapped());
         Optional<Document> previousUserLoginData = UserProfileDaoImp.getInstance().getPreviousUserLoginDataByUserId(userId);
         if (previousUserLoginData.isEmpty()) {
             UserProfileDaoImp.getInstance().createUserDocument(userProfile.getDocumentFromObject());
             return 1;
         }
         try {
-            HttpResponse response = sendHttpPostRequest(previousUserLoginData.get());
+            HttpResponse response = sendHttpPostRequest(previousUserLoginData.get(), userProfile);
             String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
             JsonParser parser = new JsonParser();
             JsonObject jsonObject = parser.parse(responseString).getAsJsonObject();
             JsonElement jsonElement = jsonObject.get("risk-score");
-            return jsonElement.getAsInt();
+            return Integer.parseInt(jsonElement.getAsString());
 
         } catch (IOException e) {
             throw new ServerException("An error occurred while connecting to the server to calculate the risk-score.");
         }
     }
 
-    // TODO: Need to introduce another function to update the user Attributes after successful login.
-    private HttpResponse sendHttpPostRequest(Document previousLoginData) throws IOException {
+    private HttpResponse sendHttpPostRequest(Document previousLoginData, UserProfile userProfile) throws IOException {
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            String uri = ConfigReader.getServerHostName() + "/" + ConfigReader.getServerPort();
+            String uri = ConfigReader.getServerUri() + "/calculate_risk_score";
             HttpPost httpPost = new HttpPost(uri);
 
             List<NameValuePair> nameValuePairs = userProfile.compareWithPreviousLoginData(previousLoginData);
