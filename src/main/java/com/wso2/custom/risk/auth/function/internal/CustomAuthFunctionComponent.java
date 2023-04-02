@@ -1,6 +1,8 @@
 package com.wso2.custom.risk.auth.function.internal;
 
+import com.wso2.custom.risk.auth.function.GetRiskScore;
 import com.wso2.custom.risk.auth.function.GetRiskScoreImpl;
+import com.wso2.custom.risk.auth.function.UpdateUserProfile;
 import com.wso2.custom.risk.auth.function.UpdateUserProfileImpl;
 import com.wso2.custom.risk.auth.function.util.ConfigReader;
 
@@ -28,9 +30,12 @@ public class CustomAuthFunctionComponent {
     @Activate
     protected void activate(ComponentContext ctxt) {
 
-        jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "getRiskScoreFromContext", new GetRiskScoreImpl());
-        jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "updateUserRiskProfile", new UpdateUserProfileImpl());
-        ConfigReader.readProperties();
+        GetRiskScore getRiskScore = new GetRiskScoreImpl();
+        jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "getRiskScoreFromContext", getRiskScore);
+
+        UpdateUserProfile userProfile = new UpdateUserProfileImpl();
+        jsFunctionRegistry.register(JsFunctionRegistry.Subsystem.SEQUENCE_HANDLER, "updateUserRiskProfile", userProfile);
+        ConfigReader.loadProperties();
     }
 
     @Deactivate
