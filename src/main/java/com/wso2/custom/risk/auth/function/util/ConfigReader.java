@@ -2,41 +2,44 @@ package com.wso2.custom.risk.auth.function.util;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 
 public class ConfigReader {
-
-    private static Properties properties;
+    private static Map<String, String> configMap = new HashMap<>();
 
     private ConfigReader() {
 
     }
 
 
-    public static void readProperties() {
+    public static void loadProperties() {
 
-        try (InputStream input = new FileInputStream("src/main/resources/config.properties")) {
-            // Load a properties file.
-            properties = new Properties();
-            properties.load(input);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        // DB properties.
+        configMap.put("mongo.uri", "mongodb://localhost:27017");
+
+        // Server properties.
+        configMap.put("server.uri", "http://localhost:5000");
+
+        // User properties.
+        configMap.put("user.save_ip_address", "true");
     }
 
     public static Optional<String> getProperty(String propertyName) {
 
-        String property = properties.getProperty(propertyName);
-        if (StringUtils.isNotEmpty(property)) {
-            return Optional.of(property);
+        if (configMap.containsKey(propertyName)) {
+            return Optional.of(configMap.get(propertyName));
         }
         return Optional.empty();
+    }
+
+    public static String getProperty(String propertyName, String defaultValue) {
+
+        if (configMap.containsKey(propertyName)) {
+            return configMap.get(propertyName);
+        }
+        return defaultValue;
     }
 
     public static Optional<String> getDBUri() {
@@ -44,45 +47,14 @@ public class ConfigReader {
         return getProperty("mongo.uri");
     }
 
-    public static Optional<String> getDbUser() {
-
-        return getProperty("mongo.user");
-    }
-
-    public static Optional<String> getDBPassword() {
-
-        return getProperty("mongo.password");
-    }
-
-    public static String getDBHost() {
-
-        return properties.getProperty("mongo.host", "localhost");
-    }
-
-    public static String getDBPort() {
-
-        return properties.getProperty("mongo.port", "27017");
-    }
-
-    public static boolean isSSLEnabled() {
-
-        String property = properties.getProperty("mongo.ssl_enabled", "false");
-        return Boolean.parseBoolean(property);
-    }
-
     public static boolean canSaveIpAddress() {
 
-        String property = properties.getProperty("user.save_ip_address", "false");
+        String property = getProperty("user.save_ip_address", "false");
         return Boolean.parseBoolean(property);
     }
 
-    public static String getServerHostName() {
+    public static String getServerUri() {
 
-        return properties.getProperty("server.host.name", "localhost");
-    }
-
-    public static String getServerPort() {
-
-        return properties.getProperty("server.port", "5000");
+        return getProperty("server.uri", "https://localhost:5000");
     }
 }
