@@ -14,7 +14,7 @@ public class UpdateUserProfileImpl implements UpdateUserProfile {
     private static final Log log = LogFactory.getLog(UpdateUserProfileImpl.class);
 
     @Override
-    public void updateUserProfile(JsAuthenticationContext context, JsServletRequest request) {
+    public void updateUserRiskProfile(JsAuthenticationContext context, JsServletRequest request) {
 
         String userId;
         try {

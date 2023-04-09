@@ -46,12 +46,10 @@ public class GetRiskScoreImpl implements GetRiskScore {
         UserProfile userProfile = RiskScoreUtil.getUserProfileFromHttpRequest(userId, request.getWrapped().getWrapped());
         Optional<Document> previousUserLoginData = UserProfileDaoImp.getInstance().getPreviousUserLoginDataByUserId(userId);
         if (previousUserLoginData.isEmpty()) {
-            UserProfileDaoImp.getInstance().createUserDocument(userProfile.getDocumentFromObject());
             return 1;
         }
         try {
-            HttpResponse response = sendHttpPostRequest(previousUserLoginData.get(), userProfile);
-            String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            String responseString = sendHttpPostRequest(previousUserLoginData.get(), userProfile);
             JsonParser parser = new JsonParser();
             JsonObject jsonObject = parser.parse(responseString).getAsJsonObject();
             JsonElement jsonElement = jsonObject.get("risk-score");
@@ -62,7 +60,7 @@ public class GetRiskScoreImpl implements GetRiskScore {
         }
     }
 
-    private HttpResponse sendHttpPostRequest(Document previousLoginData, UserProfile userProfile) throws IOException {
+    private String sendHttpPostRequest(Document previousLoginData, UserProfile userProfile) throws IOException {
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             String uri = ConfigReader.getServerUri() + "/calculate_risk_score";
@@ -75,7 +73,7 @@ public class GetRiskScoreImpl implements GetRiskScore {
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new UnexpectedException("An error has occurred while calculation the risk-score.");
             }
-            return response;
+            return EntityUtils.toString(response.getEntity(), "UTF-8");
         }
     }
 

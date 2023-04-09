@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 import com.wso2.custom.risk.auth.function.util.ConfigReader;
 
 import org.bson.Document;
@@ -21,8 +22,7 @@ public class UserProfileDaoImp implements UserProfileDao {
 
     private final static String DATABASE_NAME = "WSO2_IS_RISK_AUTH";
     private final static String COLLECTION_NAME = "USER_ATTR";
-
-
+    private final static String USER_ID = "user_id";
 
     private UserProfileDaoImp () {
 
@@ -45,7 +45,7 @@ public class UserProfileDaoImp implements UserProfileDao {
 
         try {
             createConnection();
-            Document userDocument = userAttributeCollection.find(new Document("user_id", userId)).first();
+            Document userDocument = userAttributeCollection.find(new Document(USER_ID, userId)).first();
             if (userDocument != null) {
                 return Optional.of(userDocument);
             }
@@ -60,8 +60,9 @@ public class UserProfileDaoImp implements UserProfileDao {
 
         try {
             createConnection();
-            Bson filter = Filters.eq("userId", userId);
-            userAttributeCollection.replaceOne(filter, userProfile);
+            Bson filter = Filters.eq(USER_ID, userId);
+            ReplaceOptions opts = new ReplaceOptions().upsert(true);
+            userAttributeCollection.replaceOne(filter, userProfile, opts);
         } finally {
             mongoClient.close();
         }
